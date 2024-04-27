@@ -9,5 +9,7 @@ class TaskTag extends Pivot
 {
     use HasFactory;
 
+    protected $table = 'task_tags';
+
     protected $fillable = ['task_id', 'tag_id'];
 }
