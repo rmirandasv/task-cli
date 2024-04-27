@@ -2,9 +2,12 @@
 
 namespace App\Commands;
 
+use App\Commands\Task\AddTask;
 use App\Models\Task;
 use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
+
+use function Laravel\Prompts\{info};
 
 class InteractiveMenu extends Command
 {
@@ -13,7 +16,7 @@ class InteractiveMenu extends Command
      *
      * @var string
      */
-    protected $signature = 'interactive-menu';
+    protected $signature = 'task:menu';
 
     /**
      * The console command description.
@@ -27,70 +30,41 @@ class InteractiveMenu extends Command
      */
     public function handle()
     {
-        $option = $this->menu('Choose an option', [
-            'List tasks',
-            'Add a task',
-            'Edit a task',
-            'Delete a task',
-            'Exit',
-        ])
-            ->setForegroundColour('green')
-            ->setBackgroundColour('black')
-            ->setWidth(200)
-            ->setPadding(10)
-            ->setMargin(5)
-            ->setExitButtonText("Exit")
-            ->addLineBreak('-')
-            ->addStaticItem('Projects')
-            ->addLineBreak('')
-            ->addStaticItem('Exit')
-            ->addLineBreak('-')
-            ->open();
-
-        if ($option === null) {
-            $this->info('Goodbye!');
-            return;
-        }
+        $option = $this->rootMenu();
 
         if ($option === 0) {
-            $tasks = Task::all();
-
-            $options = $tasks->map(function ($task) {
-                return $task->name;
-            })->toArray();
-
-            if (empty($options)) {
-                $this->menu('No tasks found', ['Exit'])
-                    ->setForegroundColour('red')
-                    ->setBackgroundColour('black')
-                    ->setWidth(200)
-                    ->setPadding(10)
-                    ->setMargin(5)
-                    ->setExitButtonText("Exit")
-                    ->addLineBreak('-')
-                    ->addStaticItem('Projects')
-                    ->addLineBreak('')
-                    ->addStaticItem('Exit')
-                    ->addLineBreak('-')
-                    ->open();
-
-                return $this->handle();
-            }
-
-            $option = $this->menu('Choose a task to edit', $options)
-                ->setForegroundColour('green')
-                ->setBackgroundColour('black')
-                ->setWidth(200)
-                ->setPadding(10)
-                ->setMargin(5)
-                ->setExitButtonText("Exit")
-                ->addLineBreak('-')
-                ->addStaticItem('Projects')
-                ->addLineBreak('')
-                ->addStaticItem('Exit')
-                ->addLineBreak('-')
-                ->open();
+            $this->tasksMenu();
         }
+    }
+
+    public function tasksMenu()
+    {
+        $tasks = Task::all()->keyBy('id')->map(function ($task) {
+            return $task->name;
+        })->toArray();
+
+        $tasks = array_merge(['create' => 'Create a new task'], $tasks);
+
+        $taskId = $this->menu('Tasks', $tasks)->open();
+
+        if ($taskId === 'create') {
+            $this->call(AddTask::class);
+            $this->tasksMenu();
+        }
+
+        if ($taskId === null) {
+            $this->rootMenu();
+        }
+    }
+
+    protected function rootMenu(): ?int
+    {
+        return $this->menu('Welcome to task-cli', [
+            'Tasks',
+            'Projects',
+            'Tags',
+        ])
+        ->open();
     }
 
     /**
