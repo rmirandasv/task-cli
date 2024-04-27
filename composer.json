@@ -19,6 +19,7 @@
         "php": "^8.2.0",
         "illuminate/database": "^11.5",
         "laravel-zero/framework": "^11.0.0",
+        "laravel/prompts": "^0.1.20",
         "nunomaduro/laravel-console-menu": "^3.5"
     },
     "require-dev": {
