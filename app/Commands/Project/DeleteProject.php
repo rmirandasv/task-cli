@@ -50,10 +50,9 @@ class DeleteProject extends Command
             return;
         }
 
-        $project->tasks()->delete();
-
-        info('Project deleted successfully.');
-
+        $this->task('Deleting project', function () use ($project) {
+            $project->delete();
+        });
     }
 
     /**
