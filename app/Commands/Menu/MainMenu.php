@@ -42,6 +42,10 @@ class MainMenu extends Command
         if ($menu === 'project') {
             $this->call(MainProjectMenu::class);
         }
+
+        if ($menu === 'tag') {
+            $this->call(MainTagMenu::class);
+        }
     }
 
     /**
