@@ -34,11 +34,6 @@ class MainMenu extends Command
             'tag' => 'Tags',
         ])->open();
 
-        if ($menu === null) {
-            info('Goodbye!');
-            return;
-        }
-
         if ($menu === 'project') {
             $this->call(MainProjectMenu::class);
         }
@@ -46,6 +41,12 @@ class MainMenu extends Command
         if ($menu === 'tag') {
             $this->call(MainTagMenu::class);
         }
+
+        if ($menu === 'task') {
+            $this->call(MainTaskMenu::class);
+        }
+
+        info('Goodbye!');
     }
 
     /**
